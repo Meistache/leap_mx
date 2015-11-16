@@ -27,7 +27,7 @@ versioneer.versionfile_build = 'leap/mx/_version.py'
 versioneer.tag_prefix = ''  # tags are like 1.2.0
 versioneer.parentdir_prefix = 'leap.mx-'
 
-from pkg.utils.reqs import parse_requirements, is_develop_mode
+from pkg.utils.reqs import parse_requirements
 
 trove_classifiers = [
     'Development Status :: 3 - Alpha',
@@ -113,24 +113,7 @@ else:
     # be automatically
     # placed by distutils, using whatever interpreter is
     # available.
-    data_files = [("/usr/local/bin/", ["pkg/mx.tac"])]
-
-
-requirements = parse_requirements()
-
-if is_develop_mode():
-    print
-    print ("[WARNING] Skipping leap-specific dependencies "
-           "because development mode is detected.")
-    print ("[WARNING] You can install "
-           "the latest published versions with "
-           "'pip install -r pkg/requirements-leap.pip'")
-    print ("[WARNING] Or you can instead do 'python setup.py develop' "
-           "from the parent folder of each one of them.")
-    print
-else:
-    requirements += parse_requirements(
-        reqfiles=["pkg/requirements-leap.pip"])
+    data_files = [("/usr/share/app/", ["pkg/mx.tac"])]
 
 setup(
     name='leap.mx',
@@ -152,10 +135,8 @@ setup(
     namespace_packages=["leap"],
     package_dir={'': 'src'},
     packages=find_packages('src'),
-    test_suite='leap.mx.tests',
-    tests_require=parse_requirements(
-        reqfiles=['pkg/requirements-testing.pip']),
-    install_requires=requirements,
+    #test_suite='leap.mx.tests',
+    install_requires=parse_requirements(),
     classifiers=trove_classifiers,
     data_files=data_files
 )
