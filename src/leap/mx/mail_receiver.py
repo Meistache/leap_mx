@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 # mail_receiver.py
-# Copyright (C) 2013 LEAP
+# Copyright (C) 2013, 2015 LEAP
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -166,7 +166,7 @@ class MailReceiver(Service):
         :param pubkey: public key for the owner of the message
         :type pubkey: str
         :param message: message contents
-        :type message: email.message.Message
+        :type message: str
 
         :return: doc to sync with Soledad or None, None if something
                  went wrong.
@@ -177,13 +177,10 @@ class MailReceiver(Service):
                     "I know: %r" % (pubkey,))
             return None
 
-        # find message's encoding
-        message_as_string = message.as_string()
-
         doc = ServerDocument(doc_id=str(pyuuid.uuid4()))
 
         # store plain text if pubkey is not available
-        data = {'incoming': True, 'content': message_as_string}
+        data = {'incoming': True, 'content': message}
         if pubkey is None or len(pubkey) == 0:
             doc.content = {
                 self.INCOMING_KEY: True,
@@ -269,7 +266,7 @@ class MailReceiver(Service):
             return None
         final_address = delivereds.pop(0)
         _, addr = email.utils.parseaddr(final_address)
-        uuid, _ = addr.split("@")
+        uuid = addr.split("@")[0]
         return uuid
 
     @defer.inlineCallbacks
@@ -385,7 +382,7 @@ class MailReceiver(Service):
                 defer.returnValue(None)
 
             log.msg("Encrypting message to %s's pubkey" % (uuid,))
-            doc = yield self._encrypt_message(pubkey, msg)
+            doc = yield self._encrypt_message(pubkey, mail_data)
 
             yield self._export_message(uuid, doc)
             yield self._remove(filepath)
