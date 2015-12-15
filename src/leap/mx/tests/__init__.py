@@ -22,7 +22,6 @@ code, using twisted.trial, for testing leap_mx.
 
 __all__ = ['test_alias_resolver']
 
-
 def run():
     """xxx fill me in"""
     pass
